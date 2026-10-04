@@ -1,0 +1,17 @@
+{
+  "name": "bits-institute",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BITS Institute — LMS, institute management and public website",
+  "scripts": {
+    "dev:web": "pnpm --filter @bits/web dev",
+    "dev:api": "pnpm --filter @bits/api start:dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm --filter @bits/db generate",
+    "db:migrate": "pnpm --filter @bits/db migrate",
+    "db:seed": "pnpm --filter @bits/db seed"
+  },
+  "engines": { "node": ">=20" }
+}
