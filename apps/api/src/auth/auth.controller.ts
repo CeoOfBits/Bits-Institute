@@ -24,11 +24,7 @@ const registerSchema = z.object({
 });
 const loginSchema = z.object({ email: z.email(), password: z.string().min(1).max(128) });
 const googleAuthSchema = z.object({
-  email: z.string().email(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  avatarUrl: z.string().optional(),
-  googleId: z.string().optional(),
+  idToken: z.string().min(10, 'Google ID token is required'),
 });
 const refreshSchema = z.object({ refreshToken: z.string().min(10).max(300) });
 const changePasswordSchema = z.object({ currentPassword: z.string().min(1), newPassword: password });

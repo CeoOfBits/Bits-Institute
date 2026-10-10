@@ -180,30 +180,86 @@ export class AuthService {
     return this.publicUser(userId);
   }
 
-  async continueWithGoogle(
-    input: { email: string; firstName?: string; lastName?: string; avatarUrl?: string; googleId?: string },
-    ctx: ClientCtx,
-  ) {
-    const email = input.email.toLowerCase().trim();
+  async continueWithGoogle(input: { idToken: string }, ctx: ClientCtx) {
+    if (!input.idToken || typeof input.idToken !== 'string') {
+      throw new UnauthorizedException('Google ID token is required');
+    }
+
+    let payload: {
+      iss?: string;
+      sub?: string;
+      aud?: string;
+      email?: string;
+      email_verified?: string | boolean;
+      name?: string;
+      picture?: string;
+      given_name?: string;
+      family_name?: string;
+      error?: string;
+      error_description?: string;
+    };
+
+    try {
+      const googleRes = await fetch(
+        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(input.idToken.trim())}`,
+        { method: 'GET' },
+      );
+
+      if (!googleRes.ok) {
+        throw new UnauthorizedException('Invalid or expired Google authentication token');
+      }
+
+      payload = (await googleRes.json()) as typeof payload;
+    } catch (err: any) {
+      if (err instanceof HttpException) throw err;
+      throw new UnauthorizedException('Failed to communicate with Google authentication servers');
+    }
+
+    // 1. Verify Issuer
+    if (payload.iss !== 'accounts.google.com' && payload.iss !== 'https://accounts.google.com') {
+      throw new UnauthorizedException('Invalid Google token issuer');
+    }
+
+    // 2. Verify Audience if GOOGLE_CLIENT_ID is configured
+    if (env.GOOGLE_CLIENT_ID && payload.aud !== env.GOOGLE_CLIENT_ID) {
+      throw new UnauthorizedException('Google token audience does not match configured Client ID');
+    }
+
+    // 3. Verify Email and Email Verification status
+    if (!payload.email) {
+      throw new UnauthorizedException('Google token does not contain an email address');
+    }
+
+    const isVerified = payload.email_verified === 'true' || payload.email_verified === true;
+    if (!isVerified) {
+      throw new UnauthorizedException('Google email address is not verified');
+    }
+
+    const email = payload.email.toLowerCase().trim();
+    const firstName = payload.given_name || payload.name?.split(' ')[0] || email.split('@')[0];
+    const lastName = payload.family_name || payload.name?.split(' ').slice(1).join(' ') || '';
+    const avatarUrl = payload.picture || null;
+
     let user = await this.prisma.user.findFirst({
       where: { email, deletedAt: null },
       include: { roles: { include: { role: true } } },
     });
 
     if (!user) {
+      // Create new user with default STUDENT role only. Never grant admin or instructor automatically.
       const role = await this.prisma.role.findUniqueOrThrow({ where: { key: 'STUDENT' } });
       const year = new Date().getFullYear();
       const count = await this.prisma.studentProfile.count();
       const registrationNo = `BITS-${year}-${String(count + 1).padStart(5, '0')}-${randomBytes(2).toString('hex').toUpperCase()}`;
-      const randomPass = randomBytes(16).toString('hex');
+      const randomPass = randomBytes(32).toString('hex');
 
       user = await this.prisma.user.create({
         data: {
           email,
           passwordHash: await bcrypt.hash(randomPass, 12),
-          firstName: input.firstName || email.split('@')[0],
-          lastName: input.lastName || '',
-          avatarUrl: input.avatarUrl || null,
+          firstName,
+          lastName,
+          avatarUrl,
           status: 'ACTIVE',
           emailVerifiedAt: new Date(),
           roles: { create: { roleId: role.id } },
@@ -221,13 +277,14 @@ export class AuthService {
       });
     } else {
       if (user.status !== 'ACTIVE') {
-        throw new UnauthorizedException('This account is not active');
+        throw new UnauthorizedException('This account is not active or has been suspended');
       }
+
       await this.prisma.user.update({
         where: { id: user.id },
         data: {
           lastLoginAt: new Date(),
-          avatarUrl: input.avatarUrl || user.avatarUrl,
+          avatarUrl: avatarUrl || user.avatarUrl,
           emailVerifiedAt: user.emailVerifiedAt || new Date(),
         },
       });

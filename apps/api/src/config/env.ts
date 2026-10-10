@@ -19,6 +19,7 @@ const schema = z.object({
   JWT_REFRESH_TTL_DAYS: z.coerce.number().int().positive().default(30),
   API_PORT: z.coerce.number().int().default(4000),
   WEB_ORIGIN: z.string().default('http://localhost:3000'),
+  GOOGLE_CLIENT_ID: z.string().optional(),
 });
 
 const parsed = schema.safeParse(process.env);
