@@ -869,3 +869,124 @@ model MediaAsset {
   uploadedBy String?
   createdAt  DateTime @default(now())
 }
+
+// ───────────────────────── IT Services & Project Financials ─────────────────────────
+
+enum ServiceRequestStatus {
+  NEW
+  UNDER_REVIEW
+  QUOTATION_SENT
+  APPROVED
+  IN_PROGRESS
+  DELIVERED
+  COMPLETED
+  REJECTED
+  ON_HOLD
+  CANCELLED
+}
+
+model ServiceRequest {
+  id                  String               @id @default(uuid())
+  ticketNumber        String               @unique // e.g. "SR-2026-0001"
+  clientName          String
+  clientEmail         String
+  clientPhone         String
+  companyName         String?
+  category            String               // "Web Development" | "Cyber Security" | "Networking & Infrastructure" | "Cloud & DevOps" | "Digital Marketing"
+  title               String
+  description         String
+  budgetRange         String?
+  preferredDeadline   DateTime?
+  status              ServiceRequestStatus @default(NEW)
+  assignedTo          String?              // staff or faculty member name
+  internalNotes       String?
+  clientNotes         String?
+  quotedAmountMinor   Int                  @default(0) // PKR in minor currency units (cents / paisa)
+  approvedAmountMinor Int                  @default(0) // Agreed fee
+  currency            String               @default("PKR")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  payments     ServicePayment[]
+  expenses     ServiceExpense[]
+  activityLogs ServiceActivityLog[]
+
+  @@index([status, createdAt])
+  @@index([category])
+}
+
+model ServicePayment {
+  id          String         @id @default(uuid())
+  requestId   String
+  invoiceNo   String?
+  amountMinor Int
+  currency    String         @default("PKR")
+  type        String         @default("ADVANCE") // ADVANCE | MILESTONE | FINAL | ADJUSTMENT | REFUND
+  method      String         @default("BANK_TRANSFER") // BANK_TRANSFER | CASH | ONLINE | JAZZCASH | EASYPAISA
+  reference   String?
+  notes       String?
+  status      String         @default("CONFIRMED") // CONFIRMED | PENDING
+  paidAt      DateTime       @default(now())
+  recordedBy  String?
+  createdAt   DateTime       @default(now())
+  request     ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+model ServiceExpense {
+  id          String         @id @default(uuid())
+  requestId   String
+  title       String
+  amountMinor Int
+  currency    String         @default("PKR")
+  category    String         @default("HARDWARE") // HARDWARE | SOFTWARE_LICENSE | HOSTING | DOMAIN | LABOR | MISC
+  receiptRef  String?
+  incurredAt  DateTime       @default(now())
+  createdAt   DateTime       @default(now())
+  request     ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+model ServiceActivityLog {
+  id        String         @id @default(uuid())
+  requestId String
+  action    String         // STATUS_CHANGE | NOTE_ADDED | PAYMENT_RECORDED | EXPENSE_RECORDED
+  actor     String
+  details   String
+  createdAt DateTime       @default(now())
+  request   ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+// ───────────────────────── General Admissions & Contact Inquiries ─────────────────────────
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  CLOSED
+}
+
+model Inquiry {
+  id         String        @id @default(uuid())
+  name       String
+  email      String
+  phone      String?
+  type       String        @default("ADMISSION") // ADMISSION | GENERAL | COURSE_INFO
+  subject    String?
+  courseSlug String?
+  message    String
+  status     InquiryStatus @default(NEW)
+  notes      String?
+  ip         String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([type])
+}
+

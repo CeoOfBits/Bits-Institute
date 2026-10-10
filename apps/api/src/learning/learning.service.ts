@@ -316,4 +316,313 @@ export class LearningService {
       passingPercent: attempt.quiz.passingPercent,
     };
   }
+
+  // ───────────────────────── Student Dashboard (Real Data) ─────────────────────────
+
+  async getStudentDashboard(userId: string) {
+    let student = await this.prisma.studentProfile.findUnique({
+      where: { userId },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, avatarUrl: true } },
+        certificates: {
+          include: { course: { select: { title: true, slug: true, durationLabel: true } } },
+          orderBy: { issuedAt: 'desc' },
+        },
+      },
+    });
+
+    if (!student) {
+      // Auto-initialize student profile if authenticated user logs in as student
+      student = await this.prisma.studentProfile.create({
+        data: {
+          userId,
+          registrationNo: `BITS-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        },
+        include: {
+          user: { select: { id: true, firstName: true, lastName: true, email: true, avatarUrl: true } },
+          certificates: {
+            include: { course: { select: { title: true, slug: true, durationLabel: true } } },
+            orderBy: { issuedAt: 'desc' },
+          },
+        },
+      });
+    }
+
+    // Load active enrollments
+    const enrollments = await this.prisma.courseEnrollment.findMany({
+      where: { studentId: student.id, status: 'ACTIVE' },
+      include: {
+        course: {
+          include: {
+            modules: {
+              include: { lessons: { orderBy: { sortOrder: 'asc' } } },
+              orderBy: { sortOrder: 'asc' },
+            },
+          },
+        },
+        batchEnrollments: {
+          where: { status: 'ACTIVE' },
+          include: {
+            batch: {
+              include: {
+                instructors: { include: { instructor: { include: { user: { select: { firstName: true, lastName: true } } } } } },
+                liveClasses: {
+                  where: { startsAt: { gte: new Date(Date.now() - 3600000) } },
+                  orderBy: { startsAt: 'asc' },
+                  take: 3,
+                },
+                assignments: {
+                  include: {
+                    submissions: { where: { studentId: student.id } },
+                  },
+                  orderBy: { dueAt: 'asc' },
+                },
+                quizzes: {
+                  include: {
+                    attempts: { where: { studentId: student.id }, orderBy: { startedAt: 'desc' } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Completed lessons
+    const completedLessons = await this.prisma.lessonProgress.findMany({
+      where: { studentId: student.id, completedAt: { not: null } },
+      select: { lessonId: true },
+    });
+    const completedLessonIds = new Set(completedLessons.map((l) => l.lessonId));
+
+    // Attendance stats
+    const attendanceStats = await this.getStudentAttendanceSummary(student.id);
+
+    // Calculate total & completed lessons across enrolled courses
+    let totalLessonsCount = 0;
+    let completedLessonsCount = 0;
+
+    const formattedCourses = enrollments.map((enr) => {
+      const course = enr.course;
+      const allLessons = course.modules.flatMap((m) => m.lessons);
+      const cTotal = allLessons.length;
+      const cCompleted = allLessons.filter((l) => completedLessonIds.has(l.id)).length;
+      totalLessonsCount += cTotal;
+      completedLessonsCount += cCompleted;
+
+      const progressPct = cTotal > 0 ? Math.round((cCompleted / cTotal) * 100) : 0;
+      const activeBatch = enr.batchEnrollments[0]?.batch;
+
+      return {
+        id: course.id,
+        title: course.title,
+        slug: course.slug,
+        durationLabel: course.durationLabel,
+        level: course.level,
+        progressPct,
+        completedCount: cCompleted,
+        totalLessons: cTotal,
+        batch: activeBatch
+          ? {
+              id: activeBatch.id,
+              name: activeBatch.name,
+              code: activeBatch.code,
+              mode: activeBatch.mode,
+              scheduleNote: activeBatch.scheduleNote,
+              instructors: activeBatch.instructors.map((i) => ({
+                name: `${i.instructor.user.firstName} ${i.instructor.user.lastName}`,
+                role: i.role,
+              })),
+              upcomingClasses: activeBatch.liveClasses,
+              assignments: activeBatch.assignments.map((a) => ({
+                id: a.id,
+                title: a.title,
+                dueAt: a.dueAt,
+                maxMarks: a.maxMarks,
+                submission: a.submissions[0] || null,
+              })),
+              quizzes: activeBatch.quizzes.map((q) => ({
+                id: q.id,
+                title: q.title,
+                durationMins: q.durationMins,
+                passingPercent: q.passingPercent,
+                latestAttempt: q.attempts[0] || null,
+              })),
+            }
+          : null,
+        modules: course.modules.map((m) => ({
+          id: m.id,
+          title: m.title,
+          lessons: m.lessons.map((l) => ({
+            id: l.id,
+            title: l.title,
+            durationMins: l.durationMins,
+            type: l.type,
+            completed: completedLessonIds.has(l.id),
+          })),
+        })),
+      };
+    });
+
+    const overallProgress = totalLessonsCount > 0 ? Math.round((completedLessonsCount / totalLessonsCount) * 100) : 0;
+
+    return {
+      profile: {
+        id: student.id,
+        registrationNo: student.registrationNo,
+        name: `${student.user.firstName} ${student.user.lastName}`,
+        email: student.user.email,
+        xp: student.xp,
+        level: student.level,
+        streakDays: student.streakDays,
+      },
+      stats: {
+        enrolledCoursesCount: enrollments.length,
+        overallProgress,
+        completedLessonsCount,
+        totalLessonsCount,
+        attendancePercentage: attendanceStats.percentage,
+        attendanceSummary: attendanceStats,
+      },
+      courses: formattedCourses,
+      certificates: student.certificates.map((c) => ({
+        id: c.id,
+        code: c.code,
+        courseTitle: c.course.title,
+        grade: c.grade,
+        status: c.status,
+        issuedAt: c.issuedAt,
+      })),
+    };
+  }
+
+  async completeLesson(lessonId: string, userId: string) {
+    const student = await this.prisma.studentProfile.findUnique({ where: { userId } });
+    if (!student) throw new NotFoundException('Student profile not found');
+
+    const progress = await this.prisma.lessonProgress.upsert({
+      where: { lessonId_studentId: { lessonId, studentId: student.id } },
+      update: { completedAt: new Date() },
+      create: { lessonId, studentId: student.id, completedAt: new Date() },
+    });
+
+    // Reward 25 XP
+    await this.prisma.$transaction([
+      this.prisma.xpEvent.create({
+        data: {
+          studentId: student.id,
+          points: 25,
+          reason: 'Lesson completed',
+        },
+      }),
+      this.prisma.studentProfile.update({
+        where: { id: student.id },
+        data: { xp: { increment: 25 } },
+      }),
+    ]);
+
+    return { success: true, progress };
+  }
+
+  // ───────────────────────── Instructor Portal (Real Data) ─────────────────────────
+
+  async getInstructorDashboard(userId: string) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId },
+      include: {
+        user: { select: { firstName: true, lastName: true, email: true } },
+        batchRoles: {
+          include: {
+            batch: {
+              include: {
+                course: { select: { id: true, title: true, slug: true } },
+                enrollments: {
+                  where: { status: 'ACTIVE' },
+                  include: {
+                    student: {
+                      include: { user: { select: { firstName: true, lastName: true, email: true } } },
+                    },
+                  },
+                },
+                liveClasses: {
+                  where: { startsAt: { gte: new Date(Date.now() - 3600000) } },
+                  orderBy: { startsAt: 'asc' },
+                  take: 5,
+                },
+                assignments: {
+                  include: {
+                    submissions: {
+                      include: {
+                        student: { include: { user: { select: { firstName: true, lastName: true } } } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!instructor) {
+      throw new NotFoundException('Instructor profile not found for this user');
+    }
+
+    const assignedBatches = instructor.batchRoles.map((br) => {
+      const b = br.batch;
+      const pendingSubmissions = b.assignments.flatMap((a) =>
+        a.submissions.filter((s) => s.status === 'SUBMITTED').map((s) => ({
+          ...s,
+          assignmentTitle: a.title,
+          maxMarks: a.maxMarks,
+        })),
+      );
+
+      return {
+        batchId: b.id,
+        role: br.role,
+        batchName: b.name,
+        batchCode: b.code,
+        courseTitle: b.course.title,
+        mode: b.mode,
+        scheduleNote: b.scheduleNote,
+        activeStudentsCount: b.enrollments.length,
+        students: b.enrollments.map((enr) => ({
+          id: enr.student.id,
+          registrationNo: enr.student.registrationNo,
+          name: `${enr.student.user.firstName} ${enr.student.user.lastName}`,
+          email: enr.student.user.email,
+          joinedAt: enr.joinedAt,
+        })),
+        upcomingClasses: b.liveClasses,
+        pendingSubmissions,
+      };
+    });
+
+    const totalStudents = new Set(
+      assignedBatches.flatMap((b) => b.students.map((s) => s.id)),
+    ).size;
+
+    const allPendingSubmissions = assignedBatches.flatMap((b) => b.pendingSubmissions);
+
+    return {
+      instructor: {
+        id: instructor.id,
+        name: `${instructor.user.firstName} ${instructor.user.lastName}`,
+        email: instructor.user.email,
+        headline: instructor.headline,
+        expertise: instructor.expertise,
+      },
+      stats: {
+        totalBatches: assignedBatches.length,
+        totalStudents,
+        pendingGradingCount: allPendingSubmissions.length,
+        upcomingClassesCount: assignedBatches.flatMap((b) => b.upcomingClasses).length,
+      },
+      batches: assignedBatches,
+      pendingSubmissions: allPendingSubmissions,
+    };
+  }
 }

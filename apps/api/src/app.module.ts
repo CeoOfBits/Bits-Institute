@@ -23,6 +23,8 @@ import { LearningController } from './learning/learning.controller.js';
 import { LearningService } from './learning/learning.service.js';
 import { CmsController } from './cms/cms.controller.js';
 import { CmsService } from './cms/cms.service.js';
+import { ServicesController } from './services/services.controller.js';
+import { ServicesService } from './services/services.service.js';
 
 @Controller()
 class HealthController {
@@ -56,6 +58,7 @@ class HealthController {
     CertificatesController,
     LearningController,
     CmsController,
+    ServicesController,
   ],
   providers: [
     AuthService,
@@ -65,6 +68,7 @@ class HealthController {
     CertificatesService,
     LearningService,
     CmsService,
+    ServicesService,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: AccessGuard },

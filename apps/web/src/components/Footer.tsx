@@ -100,17 +100,17 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-cyan-400 transition-colors">
+                <Link href="/portal" className="hover:text-cyan-400 transition-colors">
                   Student Learning Portal
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-cyan-400 transition-colors">
-                  Instructor Portal
+                <Link href="/instructor" className="hover:text-cyan-400 transition-colors">
+                  Instructor Workspace
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-cyan-400 transition-colors">
+                <Link href="/admin" className="hover:text-cyan-400 transition-colors">
                   Institute Administration
                 </Link>
               </li>

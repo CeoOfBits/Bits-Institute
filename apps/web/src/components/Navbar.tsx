@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Logo } from './Logo';
@@ -8,7 +8,17 @@ import { Menu, X, ShieldCheck, ChevronRight, UserPlus, LogIn, Sparkles } from 'l
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem('bits_user') : null;
+    if (raw) {
+      try {
+        setCurrentUser(JSON.parse(raw));
+      } catch {}
+    }
+  }, [pathname]);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -70,23 +80,49 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Actions: Distinct Login & Register Buttons (Coursera Style) */}
+          {/* Actions: Dynamic Portal Link if Logged In, otherwise Login & Register */}
           <div className="hidden md:flex items-center gap-2.5">
-            <Link
-              href="/login"
-              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0056D2] hover:text-[#0041a8] px-3.5 py-2 rounded-lg hover:bg-blue-50 transition-all"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Login</span>
-            </Link>
+            {currentUser ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  href={
+                    currentUser.roles?.includes('SUPER_ADMIN') || currentUser.roles?.includes('ADMIN')
+                      ? '/admin'
+                      : currentUser.roles?.includes('INSTRUCTOR')
+                      ? '/instructor'
+                      : '/portal'
+                  }
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white bg-[#0056D2] hover:bg-[#0041a8] px-4 py-2 rounded-xl shadow-xs transition-all"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>
+                    {currentUser.roles?.includes('SUPER_ADMIN') || currentUser.roles?.includes('ADMIN')
+                      ? 'Admin Dashboard'
+                      : currentUser.roles?.includes('INSTRUCTOR')
+                      ? 'Instructor Workspace'
+                      : 'Student Portal'}
+                  </span>
+                </Link>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0056D2] hover:text-[#0041a8] px-3.5 py-2 rounded-lg hover:bg-blue-50 transition-all"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Login</span>
+                </Link>
 
-            <Link
-              href="/login?tab=register"
-              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white bg-[#0056D2] hover:bg-[#0046b0] px-4 py-2 rounded-lg shadow-2xs hover:shadow-sm transition-all transform hover:-translate-y-0.5"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Register</span>
-            </Link>
+                <Link
+                  href="/login?tab=register"
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white bg-[#0056D2] hover:bg-[#0046b0] px-4 py-2 rounded-lg shadow-2xs hover:shadow-sm transition-all transform hover:-translate-y-0.5"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Register</span>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -166,20 +202,42 @@ export function Navbar() {
           </Link>
 
           <div className="pt-4 border-t border-slate-100 flex flex-col gap-2.5">
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm"
-            >
-              Login
-            </Link>
-            <Link
-              href="/login?tab=register"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 rounded-lg bg-[#0056D2] text-white font-bold text-sm shadow-sm"
-            >
-              Register Account
-            </Link>
+            {currentUser ? (
+              <Link
+                href={
+                  currentUser.roles?.includes('SUPER_ADMIN') || currentUser.roles?.includes('ADMIN')
+                    ? '/admin'
+                    : currentUser.roles?.includes('INSTRUCTOR')
+                    ? '/instructor'
+                    : '/portal'
+                }
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-lg bg-[#0056D2] text-white font-bold text-sm shadow-sm"
+              >
+                {currentUser.roles?.includes('SUPER_ADMIN') || currentUser.roles?.includes('ADMIN')
+                  ? 'Admin Dashboard'
+                  : currentUser.roles?.includes('INSTRUCTOR')
+                  ? 'Instructor Workspace'
+                  : 'Student Learning Portal'}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-lg border border-slate-300 text-slate-700 font-bold text-sm"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/login?tab=register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-lg bg-[#0056D2] text-white font-bold text-sm shadow-sm"
+                >
+                  Register Account
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

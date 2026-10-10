@@ -96,4 +96,52 @@ export class LearningController {
   ) {
     return this.learning.submitQuizAttempt(parseId(id), user.id, body.answers);
   }
+
+  // ───────────────────────── Student Portal Endpoints ─────────────────────────
+
+  @Roles('STUDENT', 'ADMIN', 'SUPER_ADMIN')
+  @Get('student/dashboard')
+  getStudentDashboard(@CurrentUser() user: AuthUser) {
+    return this.learning.getStudentDashboard(user.id);
+  }
+
+  @Roles('STUDENT')
+  @Post('lessons/:id/complete')
+  completeLesson(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.learning.completeLesson(parseId(id), user.id);
+  }
+
+  // ───────────────────────── Instructor Portal Endpoints ─────────────────────────
+
+  @Roles('INSTRUCTOR', 'ADMIN', 'SUPER_ADMIN')
+  @Get('instructor/dashboard')
+  getInstructorDashboard(@CurrentUser() user: AuthUser) {
+    return this.learning.getInstructorDashboard(user.id);
+  }
+
+  @Roles('INSTRUCTOR', 'ADMIN', 'SUPER_ADMIN')
+  @Post('batches/:id/live-classes')
+  createLiveClass(
+    @Param('id') id: string,
+    @Body() body: { topic: string; startsAt: string; endsAt: string; meetingUrl?: string; provider?: string },
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.learning.createLiveClass(parseId(id), user.id, {
+      ...body,
+      startsAt: new Date(body.startsAt),
+      endsAt: new Date(body.endsAt),
+    });
+  }
+
+  @Roles('INSTRUCTOR', 'ADMIN', 'SUPER_ADMIN')
+  @Post('batches/:id/assignments')
+  createAssignment(
+    @Param('id') id: string,
+    @Body() body: { title: string; description: string; dueAt: string; maxMarks?: number },
+  ) {
+    return this.learning.createAssignment(parseId(id), {
+      ...body,
+      dueAt: new Date(body.dueAt),
+    });
+  }
 }

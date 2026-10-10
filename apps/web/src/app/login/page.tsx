@@ -14,9 +14,9 @@ function LoginFormContent() {
 
   const [tab, setTab] = useState<'login' | 'register'>('login');
 
-  // Login form - default to student if student mode, else admin
-  const [email, setEmail] = useState(isStudentMode ? 'student@bits.local' : 'admin@bits.local');
-  const [password, setPassword] = useState(isStudentMode ? 'Student12345!' : 'KfCl2UvgFolj');
+  // Blank credentials by default for production security
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   // Register form
   const [firstName, setFirstName] = useState('');
@@ -32,10 +32,6 @@ function LoginFormContent() {
   useEffect(() => {
     if (searchParams.get('tab') === 'register') {
       setTab('register');
-    }
-    if (searchParams.get('role') === 'student' && searchParams.get('tab') !== 'register') {
-      setEmail('student@bits.local');
-      setPassword('Student12345!');
     }
   }, [searchParams]);
 
@@ -224,43 +220,11 @@ function LoginFormContent() {
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            {/* Demo quick fill */}
-            <div className="pt-4 border-t border-slate-100 space-y-2">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-bold">
-                Quick Access Demo Accounts
+            <div className="pt-4 border-t border-slate-100 text-center">
+              <span className="text-[11px] text-slate-500 flex items-center justify-center gap-1.5 font-medium">
+                <Lock className="w-3.5 h-3.5 text-[#0056D2]" />
+                <span>Protected by BITS Institute Enterprise Authentication</span>
               </span>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('student@bits.local');
-                    setPassword('Student12345!');
-                  }}
-                  className="py-1.5 px-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold hover:bg-emerald-100"
-                >
-                  🎓 Student Demo
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('ahmed.khan@bits.edu.pk');
-                    setPassword('Instructor12345!');
-                  }}
-                  className="py-1.5 px-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold hover:bg-slate-200"
-                >
-                  Instructor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('admin@bits.local');
-                    setPassword('KfCl2UvgFolj');
-                  }}
-                  className="py-1.5 px-2 rounded-lg bg-blue-50 border border-blue-200 text-[#0056D2] text-[11px] font-bold hover:bg-blue-100"
-                >
-                  Super Admin
-                </button>
-              </div>
             </div>
           </form>
         ) : (

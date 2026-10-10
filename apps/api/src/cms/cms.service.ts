@@ -362,74 +362,53 @@ export class CmsService {
   }
 
   async createPublicInquiry(input: any, ip?: string) {
-    const list = await this.getStoredInquiries();
-    const newInquiry = {
-      id: `inq-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
-      type: input.type === 'SERVICE' ? 'SERVICE' : 'COURSE',
-      fullName: input.fullName || 'Anonymous',
-      phone: input.phone || '',
-      email: input.email || '',
-      programOrService: input.programOrService || '',
-      organization: input.organization || '',
-      timingOrSchedule: input.timingOrSchedule || '',
-      budget: input.budget || '',
-      timeline: input.timeline || '',
-      message: input.message || '',
-      source: input.source || 'contact-page',
-      status: 'NEW', // 'NEW', 'CONTACTED', 'CONVERTED', 'CLOSED'
-      adminNotes: '',
-      ip,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    const updatedList = [newInquiry, ...list];
-    await this.prisma.siteSetting.upsert({
-      where: { key: 'inquiries' },
-      create: { key: 'inquiries', value: updatedList as any },
-      update: { value: updatedList as any },
+    const inquiry = await this.prisma.inquiry.create({
+      data: {
+        name: input.fullName || input.name || 'Anonymous',
+        email: input.email || '',
+        phone: input.phone || null,
+        type: input.type === 'SERVICE' ? 'SERVICE' : 'ADMISSION',
+        subject: input.programOrService || input.subject || null,
+        courseSlug: input.courseSlug || null,
+        message: input.message || 'No details provided',
+        status: 'NEW',
+        notes: input.organization ? `Organization: ${input.organization}` : null,
+        ip,
+      },
     });
 
-    return newInquiry;
+    return inquiry;
   }
 
   async adminListInquiries(type?: string) {
-    const list = await this.getStoredInquiries();
+    const where: any = {};
     if (type && type !== 'ALL') {
-      return list.filter((i) => i.type === type.toUpperCase());
+      where.type = type.toUpperCase();
     }
-    return list;
+    return this.prisma.inquiry.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async adminUpdateInquiry(id: string, input: any) {
-    const list = await this.getStoredInquiries();
-    const idx = list.findIndex((i) => i.id === id);
-    if (idx === -1) throw new NotFoundException('Inquiry not found');
+    const exists = await this.prisma.inquiry.findUnique({ where: { id } });
+    if (!exists) throw new NotFoundException('Inquiry not found');
 
-    const updated = {
-      ...list[idx],
-      ...input,
-      updatedAt: new Date().toISOString(),
-    };
-    list[idx] = updated;
-
-    await this.prisma.siteSetting.upsert({
-      where: { key: 'inquiries' },
-      create: { key: 'inquiries', value: list as any },
-      update: { value: list as any },
+    return this.prisma.inquiry.update({
+      where: { id },
+      data: {
+        status: input.status ?? exists.status,
+        notes: input.adminNotes ?? input.notes ?? exists.notes,
+      },
     });
-
-    return updated;
   }
 
   async adminDeleteInquiry(id: string) {
-    const list = await this.getStoredInquiries();
-    const filtered = list.filter((i) => i.id !== id);
-    await this.prisma.siteSetting.upsert({
-      where: { key: 'inquiries' },
-      create: { key: 'inquiries', value: filtered as any },
-      update: { value: filtered as any },
-    });
+    const exists = await this.prisma.inquiry.findUnique({ where: { id } });
+    if (!exists) throw new NotFoundException('Inquiry not found');
+
+    await this.prisma.inquiry.delete({ where: { id } });
     return { success: true };
   }
 }
