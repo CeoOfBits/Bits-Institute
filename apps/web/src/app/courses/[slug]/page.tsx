@@ -51,16 +51,16 @@ export default async function CourseDetailPage({
   }
 
   return (
-    <div className="bg-white min-h-screen space-y-16 pb-20">
+    <div className="bg-white min-h-screen space-y-12 pb-16">
       {/* ── COURSE HERO (CLEAN BLUE TINT) ── */}
-      <section className="bg-gradient-to-b from-blue-50/80 via-white to-white border-b border-slate-200 pt-12 pb-16">
+      <section className="bg-gradient-to-b from-blue-50/70 via-white to-white border-b border-slate-100 pt-10 pb-12 sm:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl space-y-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-blue-100 text-[#0056D2]">
+          <div className="max-w-4xl space-y-5">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0056D2]">
                 {course.category?.name}
               </span>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
                 Level: {course.level}
               </span>
               <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
@@ -69,20 +69,20 @@ export default async function CourseDetailPage({
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-snug">
               {course.title}
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
               {course.shortDescription}
             </p>
 
-            <div className="pt-2 flex flex-wrap items-center gap-6 text-sm text-slate-600 font-medium">
-              <div className="flex items-center gap-2">
+            <div className="pt-1 flex flex-wrap items-center gap-5 text-xs sm:text-sm text-slate-600 font-medium">
+              <div className="flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-[#0056D2]" />
                 <span>Verifiable BITS Certificate ({course.certificateCode})</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>Hands-on Enterprise Labs</span>
               </div>
@@ -93,13 +93,13 @@ export default async function CourseDetailPage({
 
       {/* ── MAIN CONTENT & BATCHES GRID ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Left Column: Overview, Outcomes, Curriculum, FAQs */}
-          <div className="lg:col-span-2 space-y-12">
+          <div className="lg:col-span-2 space-y-10">
             {/* Overview */}
-            <section className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-900">Course Overview</h2>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+            <section className="space-y-3">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Course Overview</h2>
+              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line font-normal">
                 {course.description}
               </p>
             </section>
@@ -216,10 +216,10 @@ export default async function CourseDetailPage({
                   Tuition Fee
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-black text-slate-900">
+                  <span className="text-2xl font-bold text-slate-900">
                     PKR {(course.priceMinor / 100).toLocaleString()}
                   </span>
-                  <span className="text-xs text-emerald-600 font-bold">Installment Options</span>
+                  <span className="text-xs text-emerald-600 font-semibold">Installment Options</span>
                 </div>
               </div>
 

@@ -11,6 +11,10 @@ import {
   Code2,
   Cpu,
   Calendar,
+  ShieldCheck,
+  Award,
+  GraduationCap,
+  Users,
 } from 'lucide-react';
 
 async function getCourses(category?: string, search?: string) {
@@ -134,30 +138,135 @@ export default async function CoursesPage({
   const [courses, categories] = await Promise.all([getCourses(category, search), getCategories()]);
 
   return (
-    <div className="bg-white min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-100 text-[#0056D2] text-xs font-bold shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#0056D2]" />
-            <span>Interactive Enterprise Curricula • Admissions Open Q2 2026</span>
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
-            Our Certified Courses & Active Batches
-          </h1>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Every program features hands-on physical labs, certified instructors, real-world project portfolios,
-            and verifiable graduation certificates recognized by industry employers.
-          </p>
-        </div>
+    <div className="bg-white min-h-screen space-y-16 pb-16">
+      {/* ── HERO BANNER (MATCHING HOME & SERVICES MODERN DARK HIGH-TECH STYLE) ── */}
+      <section className="relative overflow-hidden bg-[#040714] text-white pt-12 pb-14 sm:pt-16 sm:pb-18 lg:pt-20 lg:pb-20 border-b border-cyan-950/40">
+        {/* Soft Ambient Glows */}
+        <div className="absolute top-0 right-1/4 w-[550px] h-[550px] bg-cyan-500/12 rounded-full blur-[150px] pointer-events-none -z-0" />
+        <div className="absolute -top-20 left-10 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none -z-0" />
+        <div className="absolute bottom-0 left-1/3 w-[600px] h-[300px] bg-indigo-600/10 rounded-full blur-[160px] pointer-events-none -z-0" />
 
-        {/* Category Filter Pills (Coursera style) */}
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+        {/* Cyber Grid Pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.08] pointer-events-none -z-0"
+          style={{
+            backgroundImage: `linear-gradient(to right, #38bdf8 1px, transparent 1px), linear-gradient(to bottom, #38bdf8 1px, transparent 1px)`,
+            backgroundSize: '40px 40px',
+          }}
+        />
+        {/* Radial Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-15%,rgba(14,165,233,0.2),rgba(4,7,20,0.96))] pointer-events-none -z-0" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
+          <div className="text-center max-w-3xl mx-auto space-y-5">
+            {/* Top Announcement Badge */}
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/40 text-cyan-300 text-xs font-semibold shadow-[0_0_25px_rgba(6,182,212,0.25)] backdrop-blur-md">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-80" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400" />
+              </span>
+              <span>Interactive Enterprise Curricula • Admissions Open Q2 2026</span>
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
+              Certified Technology Courses &{' '}
+              <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(56,189,248,0.35)]">
+                Active Cohorts
+              </span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-normal">
+              Every program features hands-on physical Cisco hardware labs, certified mentors, live projects,
+              and verifiable graduation certificates recognized by industry employers globally.
+            </p>
+
+            {/* Two Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+              <a
+                href="#courses-catalog"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 hover:from-blue-500 hover:via-cyan-500 hover:to-blue-500 shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,0.6)] transition-all transform hover:-translate-y-0.5"
+              >
+                <Sparkles className="w-4 h-4 text-cyan-200" />
+                <span>Explore Open Batches</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+
+              <Link
+                href="/verify"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-200 bg-slate-900/80 hover:bg-slate-800 hover:text-white border border-slate-700/80 hover:border-cyan-400/50 backdrop-blur-md transition-all shadow-sm"
+              >
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Verify a Credential</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* ── 4-PILLAR ACADEMY GUARANTEE BARS (SAME DESIGN AS HOME PAGE) ── */}
+          <div className="pt-6 border-t border-slate-800/80">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex items-start gap-3.5 hover:border-cyan-500/30 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-800/60 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform shrink-0">
+                  <Server className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-left">
+                  <h2 className="text-xs sm:text-sm font-bold text-white">Physical Cisco Hardware</h2>
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-normal">
+                    Real 2960 switches & 2911 routers. Hands-on console cable configuration.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex items-start gap-3.5 hover:border-cyan-500/30 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-800/60 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-left">
+                  <h2 className="text-xs sm:text-sm font-bold text-white">Cyber Range Sandboxes</h2>
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-normal">
+                    Offensive penetration testing, defensive SOC analysis, and Kali Linux labs.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex items-start gap-3.5 hover:border-cyan-500/30 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-800/60 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-left">
+                  <h2 className="text-xs sm:text-sm font-bold text-white">16-Student Lab Cap</h2>
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-normal">
+                    Guaranteed individual hardware access for every enrolled student.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex items-start gap-3.5 hover:border-cyan-500/30 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-amber-950/80 border border-amber-800/60 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform shrink-0">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-left">
+                  <h2 className="text-xs sm:text-sm font-bold text-white">Verifiable Credentials</h2>
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-normal">
+                    Globally verified certificates with instant public QR registry check.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── COURSES CATALOG & FILTER AREA ── */}
+      <div id="courses-catalog" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* Category Filter Pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
           <Link
-            href="/courses"
-            className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-xs ${
+            href="/courses#courses-catalog"
+            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
               !category
-                ? 'bg-[#0056D2] text-white shadow-md shadow-blue-500/20'
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md shadow-blue-500/20'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -166,10 +275,10 @@ export default async function CoursesPage({
           {categories.map((cat: any) => (
             <Link
               key={cat.id}
-              href={`/courses?category=${cat.slug}`}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-xs ${
+              href={`/courses?category=${cat.slug}#courses-catalog`}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                 category === cat.slug
-                  ? 'bg-[#0056D2] text-white shadow-md shadow-blue-500/20'
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md shadow-blue-500/20'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
@@ -179,7 +288,7 @@ export default async function CoursesPage({
         </div>
 
         {/* Courses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
           {courses.map((course: any) => {
             const meta = COURSE_ENHANCEMENTS[course.slug] || {
               badge: 'Certified Program',
@@ -202,28 +311,28 @@ export default async function CoursesPage({
             return (
               <div
                 key={course.id}
-                className="group bg-white rounded-3xl border border-slate-200 hover:border-[#0056D2]/50 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
+                className="group bg-white rounded-2xl border border-slate-200 hover:border-blue-400 shadow-2xs hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col justify-between overflow-hidden"
               >
                 {/* ── CARD TOP ACCENT BANNER ── */}
-                <div className={`p-6 bg-gradient-to-br ${meta.gradient} text-white relative overflow-hidden`}>
+                <div className={`p-4 sm:p-5 bg-gradient-to-br ${meta.gradient} text-white relative overflow-hidden`}>
                   <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />
 
                   <div className="flex items-center justify-between gap-2 relative z-10">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20">
                       {meta.badge}
                     </span>
-                    <span className="text-xs font-semibold text-blue-100 flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-cyan-300" />
+                    <span className="text-[11px] font-medium text-blue-100 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-cyan-200" />
                       {course.durationLabel || '3 Months'}
                     </span>
                   </div>
 
-                  <div className="mt-5 flex items-center gap-3.5 relative z-10">
-                    <div className={`w-12 h-12 rounded-xl ${meta.iconBg} backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0`}>
-                      <Icon className="w-6 h-6" />
+                  <div className="mt-4 flex items-center gap-2.5 relative z-10">
+                    <div className={`w-10 h-10 rounded-xl ${meta.iconBg} backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0`}>
+                      <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-xs text-cyan-200 font-bold uppercase tracking-wider block">
+                      <span className="text-[10px] text-cyan-200 font-bold uppercase tracking-wider block">
                         {course.category?.name || 'Technology'}
                       </span>
                       <span className="text-xs font-semibold text-white/90">
@@ -234,41 +343,41 @@ export default async function CoursesPage({
                 </div>
 
                 {/* ── CARD BODY ── */}
-                <div className="p-6 sm:p-7 space-y-4 flex-1 flex flex-col justify-between">
-                  <div className="space-y-3.5">
+                <div className="p-4 sm:p-5 space-y-3.5 flex-1 flex flex-col justify-between">
+                  <div className="space-y-3">
                     {/* Urgency Pill & Rating */}
                     <div className="flex items-center justify-between">
-                      <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${meta.urgencyColor}`}>
-                        <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${meta.urgencyColor}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
                         {meta.urgency}
                       </span>
 
-                      <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
+                      <div className="flex items-center gap-1 text-amber-500 text-xs font-semibold">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         <span>4.9</span>
-                        <span className="text-slate-400 font-normal">({meta.reviews})</span>
+                        <span className="text-slate-400 font-normal text-[11px]">({meta.reviews})</span>
                       </div>
                     </div>
 
                     {/* Title */}
-                    <h2 className="text-lg font-extrabold text-slate-900 group-hover:text-[#0056D2] transition-colors leading-snug">
+                    <h2 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#0056D2] transition-colors leading-snug">
                       <Link href={`/courses/${course.slug}`}>{course.title}</Link>
                     </h2>
 
                     {/* Description */}
-                    <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                       {course.shortDescription}
                     </p>
 
                     {/* Bullet Points */}
-                    <div className="pt-3 space-y-2 border-t border-slate-100">
+                    <div className="pt-2.5 space-y-1.5 border-t border-slate-100">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                         Hands-on Competencies Covered
                       </span>
                       {meta.bullets.map((bullet, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs text-slate-700">
+                        <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                          <span className="text-xs leading-tight font-medium">
+                          <span className="text-[11px] leading-tight font-normal">
                             {bullet}
                           </span>
                         </div>
@@ -276,15 +385,15 @@ export default async function CoursesPage({
                     </div>
 
                     {/* Instructor */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 text-[#0056D2] text-xs font-extrabold flex items-center justify-center">
+                    <div className="pt-2.5 border-t border-slate-100 flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-[#0056D2] text-[10px] font-bold flex items-center justify-center">
                         {meta.instructor.initials}
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-slate-800 leading-tight">
+                        <div className="text-xs font-semibold text-slate-800 leading-tight">
                           {meta.instructor.name}
                         </div>
-                        <div className="text-[11px] text-slate-500 leading-tight">
+                        <div className="text-[10px] text-slate-500 leading-tight">
                           {meta.instructor.title}
                         </div>
                       </div>
@@ -292,33 +401,33 @@ export default async function CoursesPage({
                   </div>
 
                   {/* ── CARD FOOTER ── */}
-                  <div className="pt-5 border-t border-slate-100 mt-4 space-y-3.5">
+                  <div className="pt-3 border-t border-slate-100 mt-2 space-y-2.5">
                     <div className="flex items-baseline justify-between">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Tuition</span>
-                        <span className="text-xl font-black text-slate-900">
+                        <span className="text-[10px] uppercase font-semibold text-slate-400 block">Tuition</span>
+                        <span className="text-base sm:text-lg font-bold text-slate-900">
                           PKR {(course.priceMinor / 100).toLocaleString()}
                         </span>
                       </div>
-                      <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                      <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
                         Installments Available
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-2 gap-2">
                       <Link
                         href={`/courses/${course.slug}`}
-                        className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold text-center transition-all"
+                        className="py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold text-center transition-all"
                       >
                         Syllabus & Labs
                       </Link>
 
                       <Link
                         href={`/courses/${course.slug}`}
-                        className="py-2.5 px-3 rounded-xl bg-[#0056D2] hover:bg-[#0041a8] text-white text-xs font-bold text-center shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5"
+                        className="py-2 px-2.5 rounded-xl bg-[#0056D2] hover:bg-[#0041a8] text-white text-xs font-semibold text-center shadow-2xs hover:shadow-sm transition-all flex items-center justify-center gap-1"
                       >
                         <span>Enroll Now</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-3 h-3" />
                       </Link>
                     </div>
                   </div>
@@ -329,30 +438,30 @@ export default async function CoursesPage({
         </div>
 
         {/* Schedule Strip */}
-        <div className="bg-gradient-to-r from-blue-50 via-white to-blue-50 rounded-2xl p-6 border border-blue-200 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-6 border border-cyan-500/20 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3.5 text-left">
-            <div className="w-12 h-12 rounded-xl bg-[#0056D2] text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Calendar className="w-6 h-6" />
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+              <Calendar className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-[#0056D2]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400">
                   Lab Hardware Capacity Notice
                 </span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               </div>
-              <p className="text-sm font-bold text-slate-900">
-                To guarantee individual Cisco switch/router access, each batch is capped at 16 students.
+              <p className="text-xs sm:text-sm font-bold text-white">
+                To guarantee individual Cisco switch/router access, each batch is strictly capped at 16 students.
               </p>
-              <p className="text-xs text-slate-500">
-                Weekend and evening batch seats are allocated on a first-come, first-served basis.
+              <p className="text-[11px] text-slate-400">
+                Weekend and evening batch workstations are allocated on a first-come, first-served basis.
               </p>
             </div>
           </div>
 
           <Link
             href="/contact"
-            className="shrink-0 px-6 py-3 rounded-xl bg-[#0056D2] hover:bg-[#0041a8] text-white text-xs font-bold shadow-sm transition-all text-center"
+            className="shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white text-xs font-semibold shadow-md transition-all text-center"
           >
             Reserve Your Hardware Workstation →
           </Link>

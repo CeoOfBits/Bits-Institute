@@ -12,8 +12,9 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
     { href: '/courses', label: 'Our Courses' },
+    { href: '/services', label: 'IT Services' },
+    { href: '/about', label: 'About' },
     { href: '/verify', label: 'Verify Certificate', highlight: true },
     { href: '/blog', label: 'Tech Blog' },
     { href: '/contact', label: 'Contact' },
@@ -33,14 +34,14 @@ export function Navbar() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 sm:h-[70px]">
           {/* Logo with Original Asset */}
-          <Link href="/" className="flex items-center gap-3 py-2">
+          <Link href="/" className="flex items-center gap-2.5 py-1.5">
             <Logo size="md" />
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-7">
+          <nav className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               if (link.highlight) {
@@ -48,9 +49,9 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="flex items-center gap-1.5 text-sm font-bold text-[#0056D2] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3.5 py-1.5 rounded-full transition-all"
+                    className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0056D2] bg-blue-50 hover:bg-blue-100/80 border border-blue-200/80 px-3 py-1.5 rounded-full transition-all"
                   >
-                    <ShieldCheck className="w-4 h-4 text-[#0056D2]" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#0056D2]" />
                     <span>{link.label}</span>
                   </Link>
                 );
@@ -59,8 +60,8 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-sm font-semibold transition-colors ${
-                    isActive ? 'text-[#0056D2] font-bold' : 'text-slate-700 hover:text-[#0056D2]'
+                  className={`text-xs sm:text-sm font-medium transition-colors ${
+                    isActive ? 'text-[#0056D2] font-semibold' : 'text-slate-600 hover:text-[#0056D2]'
                   }`}
                 >
                   {link.label}
@@ -70,20 +71,20 @@ export function Navbar() {
           </nav>
 
           {/* Actions: Distinct Login & Register Buttons (Coursera Style) */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2.5">
             <Link
               href="/login"
-              className="flex items-center gap-1.5 text-sm font-bold text-[#0056D2] hover:text-[#0041a8] px-4 py-2 rounded-lg border border-transparent hover:bg-blue-50 transition-all"
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0056D2] hover:text-[#0041a8] px-3.5 py-2 rounded-lg hover:bg-blue-50 transition-all"
             >
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-3.5 h-3.5" />
               <span>Login</span>
             </Link>
 
             <Link
               href="/login?tab=register"
-              className="flex items-center gap-1.5 text-sm font-bold text-white bg-[#0056D2] hover:bg-[#0046b0] px-5 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5"
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white bg-[#0056D2] hover:bg-[#0046b0] px-4 py-2 rounded-lg shadow-2xs hover:shadow-sm transition-all transform hover:-translate-y-0.5"
             >
-              <UserPlus className="w-4 h-4" />
+              <UserPlus className="w-3.5 h-3.5" />
               <span>Register</span>
             </Link>
           </div>
@@ -126,6 +127,14 @@ export function Navbar() {
             className="flex items-center justify-between py-2 text-sm font-semibold text-slate-800 hover:text-[#0056D2]"
           >
             <span>Our Courses</span>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+          </Link>
+          <Link
+            href="/services"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between py-2 text-sm font-semibold text-slate-800 hover:text-[#0056D2]"
+          >
+            <span>IT Services</span>
             <ChevronRight className="w-4 h-4 text-slate-400" />
           </Link>
           <Link

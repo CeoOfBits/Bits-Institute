@@ -24,43 +24,43 @@ export default async function BlogIndexPage() {
   const posts = await getBlogPosts();
 
   return (
-    <div className="bg-white min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-[#0056D2] text-xs font-bold">
+    <div className="bg-white min-h-screen py-10 sm:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+        <div className="text-center max-w-3xl mx-auto space-y-3.5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[#0056D2] text-xs font-semibold shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-[#0056D2]" />
             <span>BITS Institute Faculty Publications</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">
             Technology & Cyber Security Insights
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto font-normal">
             In-depth technical guides, enterprise vulnerability analyses, zero-trust architectures, and career strategies.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post: any) => (
             <article
               key={post.id}
-              className="blue-card rounded-2xl p-7 flex flex-col justify-between"
+              className="blue-card rounded-2xl p-6 flex flex-col justify-between"
             >
-              <div className="space-y-4">
+              <div className="space-y-3.5">
                 <div className="flex items-center justify-between text-xs text-slate-500">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0056D2]">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0056D2]">
                     {post.category?.name || 'Cyber Security'}
                   </span>
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 text-[11px]">
                     <Calendar className="w-3 h-3 text-[#0056D2]" />
                     {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : 'Recent'}
                   </span>
                 </div>
 
-                <h2 className="text-xl font-bold text-slate-900 hover:text-[#0056D2] transition-colors leading-snug">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 hover:text-[#0056D2] transition-colors leading-snug">
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                 </h2>
 
-                <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                <p className="text-xs text-slate-600 leading-relaxed line-clamp-3 font-normal">
                   {post.excerpt}
                 </p>
               </div>

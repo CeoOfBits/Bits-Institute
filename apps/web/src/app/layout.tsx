@@ -1,7 +1,16 @@
 import type { Metadata } from 'next';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { FloatingWhatsAppButton } from '@/components/FloatingWhatsAppButton';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'BITS Institute — Bright Information Technology Solutions | Premier Tech & Cyber Academy',
@@ -27,11 +36,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
+    <html lang="en" className={plusJakartaSans.variable}>
+      <body className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <FloatingWhatsAppButton />
       </body>
     </html>
   );

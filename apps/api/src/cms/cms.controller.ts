@@ -79,4 +79,78 @@ export class CmsController {
   deletePost(@Param('id') id: string, @CurrentUser() user: AuthUser, @ClientInfo() ctx: Ctx) {
     return this.cms.deletePost(parseId(id), user.id, ctx.ip);
   }
+
+  // ───────────────────────── Public IT Services ─────────────────────────
+
+  @Public()
+  @Get('public/services')
+  listPublicServices(@Query('category') category?: string) {
+    return this.cms.getPublicServices(category);
+  }
+
+  @Public()
+  @Get('public/services/:slug')
+  getPublicService(@Param('slug') slug: string) {
+    return this.cms.getPublicService(slug);
+  }
+
+  // ───────────────────────── Admin IT Services ─────────────────────────
+
+  @Get('admin/services')
+  adminListServices() {
+    return this.cms.adminListServices();
+  }
+
+  @Post('admin/services')
+  adminCreateService(
+    @Body() body: any,
+    @CurrentUser() user: AuthUser,
+    @ClientInfo() ctx: Ctx,
+  ) {
+    return this.cms.adminCreateService(body, user.id, ctx.ip);
+  }
+
+  @Patch('admin/services/:id')
+  adminUpdateService(
+    @Param('id') id: string,
+    @Body() body: any,
+    @CurrentUser() user: AuthUser,
+    @ClientInfo() ctx: Ctx,
+  ) {
+    return this.cms.adminUpdateService(id, body, user.id, ctx.ip);
+  }
+
+  @Delete('admin/services/:id')
+  adminDeleteService(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthUser,
+    @ClientInfo() ctx: Ctx,
+  ) {
+    return this.cms.adminDeleteService(id, user.id, ctx.ip);
+  }
+
+  // ───────────────────────── Public Inquiries ─────────────────────────
+
+  @Public()
+  @Post('public/inquiries')
+  createPublicInquiry(@Body() body: any, @ClientInfo() ctx: Ctx) {
+    return this.cms.createPublicInquiry(body, ctx.ip);
+  }
+
+  // ───────────────────────── Admin Inquiries ─────────────────────────
+
+  @Get('admin/inquiries')
+  adminListInquiries(@Query('type') type?: string) {
+    return this.cms.adminListInquiries(type);
+  }
+
+  @Patch('admin/inquiries/:id')
+  adminUpdateInquiry(@Param('id') id: string, @Body() body: any) {
+    return this.cms.adminUpdateInquiry(id, body);
+  }
+
+  @Delete('admin/inquiries/:id')
+  adminDeleteInquiry(@Param('id') id: string) {
+    return this.cms.adminDeleteInquiry(id);
+  }
 }

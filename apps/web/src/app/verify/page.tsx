@@ -34,26 +34,26 @@ export default function VerifyPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen py-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <div className="bg-white min-h-screen py-10 sm:py-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
         {/* Title */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-[#0056D2] text-xs font-bold">
-            <ShieldCheck className="w-4 h-4 text-[#0056D2]" />
+        <div className="text-center space-y-3.5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[#0056D2] text-xs font-semibold shadow-2xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#0056D2]" />
             <span>Official Public Credential Registry</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">
             Verify BITS Institute Certificate
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed font-normal">
             Authenticate credentials issued by BITS Institute (Bright Information Technology Solutions).
             Enter the verification serial code printed on the physical or digital certificate.
           </p>
         </div>
 
         {/* Verification Search Box */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-md">
-          <form onSubmit={handleVerify} className="space-y-4">
+        <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-sm">
+          <form onSubmit={handleVerify} className="space-y-3.5">
             <label htmlFor="certId" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
               Certificate Serial Number / Credential ID
             </label>
@@ -65,13 +65,13 @@ export default function VerifyPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="e.g. BITS-CCNA-2026-00482"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-slate-900 font-mono text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0056D2] focus:bg-white focus:ring-2 focus:ring-blue-100"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 font-mono text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0056D2] focus:bg-white focus:ring-2 focus:ring-blue-100"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#0056D2] hover:bg-[#0041a8] text-white text-sm font-bold shadow-md shadow-blue-500/20 disabled:opacity-50 transition-all shrink-0"
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#0056D2] hover:bg-[#0041a8] text-white text-xs sm:text-sm font-semibold shadow-2xs hover:shadow-sm disabled:opacity-50 transition-all shrink-0"
               >
                 {loading ? (
                   <span>Validating...</span>

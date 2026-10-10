@@ -25,7 +25,7 @@ export function Footer() {
 
           {/* Core Programs */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Core Programs</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Academic Courses</h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/courses/ccna-enterprise-networking" className="hover:text-cyan-400 transition-colors">
@@ -50,6 +50,39 @@ export function Footer() {
               <li>
                 <Link href="/courses" className="text-cyan-400 hover:underline flex items-center gap-1 font-semibold pt-1">
                   <span>View All Courses</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* IT Enterprise Services */}
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Enterprise Services</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link href="/services/enterprise-cisco-networking" className="hover:text-cyan-400 transition-colors">
+                  Cisco Network Solutions
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/cybersecurity-vapt-audits" className="hover:text-cyan-400 transition-colors">
+                  Cybersecurity & VAPT Audits
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/cloud-architecture-devops" className="hover:text-cyan-400 transition-colors">
+                  Cloud & Kubernetes DevOps
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/custom-enterprise-software" className="hover:text-cyan-400 transition-colors">
+                  Custom Web & Software Dev
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="text-cyan-400 hover:underline flex items-center gap-1 font-semibold pt-1">
+                  <span>All IT Services</span>
                   <ExternalLink className="w-3 h-3" />
                 </Link>
               </li>

@@ -117,16 +117,16 @@ function LoginFormContent() {
           <Logo size="lg" />
         </Link>
         {isStudentMode && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 border border-blue-200 text-[#0056D2] text-xs font-bold mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0056D2] text-xs font-semibold mx-auto">
             <span>🎓 Student Learning Portal</span>
           </div>
         )}
-        <h1 className="text-2xl font-black text-slate-900">
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           {tab === 'login' 
             ? (isStudentMode ? 'Student Portal Sign In' : 'Sign In to BITS Portal') 
             : 'Create Student Account'}
         </h1>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 font-normal">
           {tab === 'login'
             ? 'Access your course modules, live classes, lab schedules and certificates'
             : 'Join BITS Institute to enroll in upcoming batches and start learning today'}
@@ -134,7 +134,7 @@ function LoginFormContent() {
       </div>
 
       {/* Card Box */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl space-y-6">
+      <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-5">
         {/* Tab Selector */}
         <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
           <button
