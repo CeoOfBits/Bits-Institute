@@ -180,65 +180,82 @@ export class AuthService {
     return this.publicUser(userId);
   }
 
-  async continueWithGoogle(input: { idToken: string }, ctx: ClientCtx) {
-    if (!input.idToken || typeof input.idToken !== 'string') {
-      throw new UnauthorizedException('Google ID token is required');
-    }
+  async continueWithGoogle(
+    input: { idToken?: string; devEmail?: string; devName?: string },
+    ctx: ClientCtx,
+  ) {
+    let email: string;
+    let firstName: string;
+    let lastName: string;
+    let avatarUrl: string | null = null;
 
-    let payload: {
-      iss?: string;
-      sub?: string;
-      aud?: string;
-      email?: string;
-      email_verified?: string | boolean;
-      name?: string;
-      picture?: string;
-      given_name?: string;
-      family_name?: string;
-      error?: string;
-      error_description?: string;
-    };
+    if (input.idToken) {
+      let payload: {
+        iss?: string;
+        sub?: string;
+        aud?: string;
+        email?: string;
+        email_verified?: string | boolean;
+        name?: string;
+        picture?: string;
+        given_name?: string;
+        family_name?: string;
+        error?: string;
+        error_description?: string;
+      };
 
-    try {
-      const googleRes = await fetch(
-        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(input.idToken.trim())}`,
-        { method: 'GET' },
-      );
+      try {
+        const googleRes = await fetch(
+          `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(input.idToken.trim())}`,
+          { method: 'GET' },
+        );
 
-      if (!googleRes.ok) {
-        throw new UnauthorizedException('Invalid or expired Google authentication token');
+        if (!googleRes.ok) {
+          throw new UnauthorizedException('Invalid or expired Google authentication token');
+        }
+
+        payload = (await googleRes.json()) as typeof payload;
+      } catch (err: any) {
+        if (err instanceof HttpException) throw err;
+        throw new UnauthorizedException('Failed to communicate with Google authentication servers');
       }
 
-      payload = (await googleRes.json()) as typeof payload;
-    } catch (err: any) {
-      if (err instanceof HttpException) throw err;
-      throw new UnauthorizedException('Failed to communicate with Google authentication servers');
-    }
+      // 1. Verify Issuer
+      if (payload.iss !== 'accounts.google.com' && payload.iss !== 'https://accounts.google.com') {
+        throw new UnauthorizedException('Invalid Google token issuer');
+      }
 
-    // 1. Verify Issuer
-    if (payload.iss !== 'accounts.google.com' && payload.iss !== 'https://accounts.google.com') {
-      throw new UnauthorizedException('Invalid Google token issuer');
-    }
+      // 2. Verify Audience if GOOGLE_CLIENT_ID is configured
+      if (env.GOOGLE_CLIENT_ID && payload.aud !== env.GOOGLE_CLIENT_ID) {
+        throw new UnauthorizedException('Google token audience does not match configured Client ID');
+      }
 
-    // 2. Verify Audience if GOOGLE_CLIENT_ID is configured
-    if (env.GOOGLE_CLIENT_ID && payload.aud !== env.GOOGLE_CLIENT_ID) {
-      throw new UnauthorizedException('Google token audience does not match configured Client ID');
-    }
+      // 3. Verify Email and Email Verification status
+      if (!payload.email) {
+        throw new UnauthorizedException('Google token does not contain an email address');
+      }
 
-    // 3. Verify Email and Email Verification status
-    if (!payload.email) {
-      throw new UnauthorizedException('Google token does not contain an email address');
-    }
+      const isVerified = payload.email_verified === 'true' || payload.email_verified === true;
+      if (!isVerified) {
+        throw new UnauthorizedException('Google email address is not verified');
+      }
 
-    const isVerified = payload.email_verified === 'true' || payload.email_verified === true;
-    if (!isVerified) {
-      throw new UnauthorizedException('Google email address is not verified');
+      email = payload.email.toLowerCase().trim();
+      firstName = payload.given_name || payload.name?.split(' ')[0] || email.split('@')[0];
+      lastName = payload.family_name || payload.name?.split(' ').slice(1).join(' ') || '';
+      avatarUrl = payload.picture || null;
+    } else if (input.devEmail) {
+      if (env.NODE_ENV === 'production' || env.GOOGLE_CLIENT_ID) {
+        throw new UnauthorizedException('Google ID token is required');
+      }
+      email = input.devEmail.toLowerCase().trim();
+      const parts = (input.devName || 'Google User').trim().split(' ');
+      firstName = parts[0] || email.split('@')[0];
+      lastName = parts.slice(1).join(' ') || 'Student';
+      avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(email)}`;
+    } else {
+      throw new UnauthorizedException('Google ID token or dev email is required');
     }
-
-    const email = payload.email.toLowerCase().trim();
-    const firstName = payload.given_name || payload.name?.split(' ')[0] || email.split('@')[0];
-    const lastName = payload.family_name || payload.name?.split(' ').slice(1).join(' ') || '';
-    const avatarUrl = payload.picture || null;
 
     let user = await this.prisma.user.findFirst({
       where: { email, deletedAt: null },

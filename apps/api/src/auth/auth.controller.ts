@@ -23,9 +23,15 @@ const registerSchema = z.object({
   phone: z.string().trim().max(30).optional(),
 });
 const loginSchema = z.object({ email: z.email(), password: z.string().min(1).max(128) });
-const googleAuthSchema = z.object({
-  idToken: z.string().min(10, 'Google ID token is required'),
-});
+const googleAuthSchema = z
+  .object({
+    idToken: z.string().min(10).optional(),
+    devEmail: z.string().email().optional(),
+    devName: z.string().optional(),
+  })
+  .refine((data) => data.idToken || data.devEmail, {
+    message: 'Either idToken or devEmail is required',
+  });
 const refreshSchema = z.object({ refreshToken: z.string().min(10).max(300) });
 const changePasswordSchema = z.object({ currentPassword: z.string().min(1), newPassword: password });
 
