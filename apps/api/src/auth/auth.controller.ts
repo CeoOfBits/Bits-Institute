@@ -23,6 +23,13 @@ const registerSchema = z.object({
   phone: z.string().trim().max(30).optional(),
 });
 const loginSchema = z.object({ email: z.email(), password: z.string().min(1).max(128) });
+const googleAuthSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  avatarUrl: z.string().optional(),
+  googleId: z.string().optional(),
+});
 const refreshSchema = z.object({ refreshToken: z.string().min(10).max(300) });
 const changePasswordSchema = z.object({ currentPassword: z.string().min(1), newPassword: password });
 
@@ -43,6 +50,17 @@ export class AuthController {
   @Post('login')
   login(@Body(new ZodPipe(loginSchema)) body: z.infer<typeof loginSchema>, @ClientInfo() ctx: ClientCtx) {
     return this.auth.login(body.email, body.password, ctx);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  @HttpCode(200)
+  @Post('google')
+  continueWithGoogle(
+    @Body(new ZodPipe(googleAuthSchema)) body: z.infer<typeof googleAuthSchema>,
+    @ClientInfo() ctx: ClientCtx,
+  ) {
+    return this.auth.continueWithGoogle(body, ctx);
   }
 
   @Public()

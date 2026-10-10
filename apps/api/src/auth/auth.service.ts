@@ -179,4 +179,69 @@ export class AuthService {
   me(userId: string) {
     return this.publicUser(userId);
   }
+
+  async continueWithGoogle(
+    input: { email: string; firstName?: string; lastName?: string; avatarUrl?: string; googleId?: string },
+    ctx: ClientCtx,
+  ) {
+    const email = input.email.toLowerCase().trim();
+    let user = await this.prisma.user.findFirst({
+      where: { email, deletedAt: null },
+      include: { roles: { include: { role: true } } },
+    });
+
+    if (!user) {
+      const role = await this.prisma.role.findUniqueOrThrow({ where: { key: 'STUDENT' } });
+      const year = new Date().getFullYear();
+      const count = await this.prisma.studentProfile.count();
+      const registrationNo = `BITS-${year}-${String(count + 1).padStart(5, '0')}-${randomBytes(2).toString('hex').toUpperCase()}`;
+      const randomPass = randomBytes(16).toString('hex');
+
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          passwordHash: await bcrypt.hash(randomPass, 12),
+          firstName: input.firstName || email.split('@')[0],
+          lastName: input.lastName || '',
+          avatarUrl: input.avatarUrl || null,
+          status: 'ACTIVE',
+          emailVerifiedAt: new Date(),
+          roles: { create: { roleId: role.id } },
+          studentProfile: { create: { registrationNo } },
+        },
+        include: { roles: { include: { role: true } } },
+      });
+
+      await this.audit.record({
+        userId: user.id,
+        action: 'auth.google_register',
+        entityType: 'User',
+        entityId: user.id,
+        ip: ctx.ip,
+      });
+    } else {
+      if (user.status !== 'ACTIVE') {
+        throw new UnauthorizedException('This account is not active');
+      }
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          lastLoginAt: new Date(),
+          avatarUrl: input.avatarUrl || user.avatarUrl,
+          emailVerifiedAt: user.emailVerifiedAt || new Date(),
+        },
+      });
+
+      await this.audit.record({
+        userId: user.id,
+        action: 'auth.google_login',
+        entityType: 'User',
+        entityId: user.id,
+        ip: ctx.ip,
+      });
+    }
+
+    const publicUser = await this.publicUser(user.id);
+    return { user: publicUser, ...(await this.issueTokens(user.id, ctx)) };
+  }
 }
